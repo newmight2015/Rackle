@@ -1,7 +1,7 @@
 <?php
 	if($abe->isTransaction($_GET['query'])){
 		$viewdata['tx'] = $abe->getTransaction($_GET['query']);
-		$viewdata['tx']['confirmations'] = $abe->getNumBlocks() - $viewdata['tx']['block'];
+		$viewdata['tx']['confirmations'] = $abe->getNumBlocks() - $viewdata['tx']['height'];
 		
 		// Prettify & Linkify
 		$viewdata['tx']['time'] = date("Y-m-d H:i:s", $viewdata['tx']['time']);
