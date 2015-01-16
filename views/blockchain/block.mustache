@@ -1,0 +1,30 @@
+<h2><span style="float: left">Block <small>{{ block.hash }}</small></span><span style="float: right">{{ block.size }} bytes</span></h2>
+<span class="clr">&nbsp;</span>
+
+<table class="keyvalue">
+	<thead>
+		<tr><th colspan="2">Statistics</th></tr>
+	</thead>
+	<tbody>
+		<tr><td>Height</td><td>{{ block.height }}</td></tr>
+		<tr><td>Hash</td><td>{{ block.hash }}</td></tr>
+		<tr><td>Merkle Root</td><td>{{ block.merkle }}</td></tr>
+		<tr><td>Timestamp</td><td>{{ block.time }}</td></tr>
+		<tr><td>Transaction Count</td><td>{{ block.num_tx }}</td></tr>
+		<tr><td>Total Output</td><td>{{ block.output }} OMC</td></tr>
+		<tr><td>Difficulty</td><td>{{ block.difficulty }}</td></tr>
+		<tr><td>Size</td><td>{{ block.size }} bytes</td></tr>
+	</tbody>
+</table>
+
+<h2>Transactions</h2>
+<table>
+	<thead>
+		<tr><th>Transaction Hash</th><th>Size</th><th>Amount</th></tr>
+	</thead>
+	<tbody>
+		{{# block.transactions }}
+		<tr><td>{{{ hash }}} {{ coinbase }}</td><td>{{ size }} bytes</td><td>{{ amount }} OMC</td></tr>
+		{{/ block.transactions }}
+	</tbody>
+</table>

@@ -1,0 +1,56 @@
+<h2><span style="float: left">Transaction <small>{{ tx.hash }}</small></span><span style="float: right">{{ tx.size }} bytes</span></h2>
+<span class="clr">&nbsp;</span>
+<table id="bc_txStatsTable" class="keyvalue">
+	<thead>
+		<tr><th colspan="2">Statistics</th></tr>
+	</thead>
+	<tbody>
+		<tr><td><b>Timestamp</b></td><td>{{ tx.time }}</td></tr>
+		<tr><td><b>Transaction Size</b></td><td>{{ tx.size }} bytes</td></tr>
+		<tr><td><b>Included in Block</b></td><td>{{{ tx.block }}}</td></tr>
+		<tr><td><b>Confirmations</b></td><td>{{ tx.confirmations }} (<a href="#">Enable Notification</a>)</td></tr>
+	</tbody>
+</table>
+<br />
+<!--<table id="bc_txConfTable">
+	<thead>
+		<tr><th>Confirmation</th></tr>
+	</thead>
+	<tbody>
+		<tr><td>
+			<svg width="109" height="109" viewbox="-1 0 109 109">
+				<circle cx="54" cy="54" r="54" style="fill: #F9F4FF" />
+				<path id="circle" d="{{ tx.confSVG }}" style="fill: #715599" transform="translate(54, 54)" />
+				<text x="54" y="87" text-anchor="middle" style="font-size: 100px; font-weight: 400; fill:#715599;{{ confHideZero }}">0</text>
+			</svg>
+		</td></tr>
+	</tbody>
+</table>-->
+<br />
+<table id="bc_inputsTable">
+	<thead>
+		<tr><th colspan="2">Inputs</th></tr>
+	</thead>
+	<tbody>
+		{{# tx.inputs }}
+		<tr>
+			<td>{{{ address }}}</td>
+			<td class="amount">{{ amount }} OMC</td>
+		</tr>
+		{{/ tx.inputs }}
+	</tbody>
+</table>
+<table id="bc_outputsTable">
+	<thead>
+		<tr><th colspan="2">Outputs</th></tr>
+	</thead>
+	<tbody>
+		{{# tx.outputs }}
+		<tr>
+			<td>{{{ address }}}</td>
+			<td class="amount">{{ amount }} OMC</td>
+		</tr>
+		{{/ tx.outputs }}
+	</tbody>
+</table>
+<span class="clr">&nbsp;</span>

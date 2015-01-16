@@ -1,0 +1,40 @@
+/* Global */
+#bc_searchFld {
+	width: 945px;
+	font-family: Source Sans Pro;
+	font-size: 16pt;
+	font-weight: 300;
+	padding: 5px;
+	background-color: #FAFAFA;
+	border: 1px solid #A97CE7;
+	border-radius: 4px 4px;
+}
+
+/* Transactions */
+#bc_txStatsTable {
+	width: 1050px; /* 889 with confirmation box */
+	float: left;
+	margin-right: 25px;
+	margin-bottom: 25px;
+}
+
+#bc_txConfTable {
+	width: 136px;
+	float: left;
+	margin-bottom: 25px;
+}
+
+#bc_inputsTable {
+	width: 513px;
+	margin-right: 24px;
+	float: left;
+}
+
+#bc_outputsTable {
+	width: 513px;
+	float: left;
+}
+
+#bc_confirmationPie {
+	width: 200px;
+}

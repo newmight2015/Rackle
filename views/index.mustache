@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>{{ title }}</title>
+		<link type="text/css" rel="stylesheet" href="/css/global.css" />
+		<link type="text/css" rel="stylesheet" href="/css/whhg.css" />
+		{{{ stylesheet }}}
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		{{{ javascript }}}
+	</head>
+	<body>
+		<nav>
+			<div id="navwrap">
+				<ul>
+					{{# menuitems }}
+						<li class="{{ is_active }}"><a href="{{ link }}"><i class="icon-{{ icon }}"></i>{{ title }}</a></li>
+					{{/ menuitems }}
+				</ul>
+			</div>
+		</nav>
+		<div id="conwrap">
+			<h1>{{ title }}</h1>
+			<div id="content">
+				{{# messages }}
+					<div class="{{ type }} message">{{& message }}</div>
+				{{/ messages }}
+				{{{ content }}}
+			</div>
+			<footer>
+				<ul>
+					About
+					<li>Link 1</li>
+					<li>Link 2</li>
+				</ul>
+				<ul>
+					Sitemap
+					<li>Link 1</li>
+					<li>Link 2</li>
+				</ul>
+				<ul>
+					Articles
+					<li>Link 1</li>
+					<li>Link 2</li>
+				</ul>
+				<div class="clr"></div>
+			</footer>
+		</div>
+	</body>
+</html>
