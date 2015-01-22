@@ -25,14 +25,13 @@
 		// Prettify numbers (Thousand separator and +/- colors)
 		$tx['amount'] = "<span style='color:$amtcolor'>" . number_format($tx['amount'] / pow(10,8), 8) . "</span>";
 		$tx['balance'] = number_format($tx['balance'] / pow(10, 8), 8);
-		$tx['height'] = number_format($tx['height']);
 
 		// Format timestamp
 		$tx['time'] = date("Y-m-d H:i:s", $tx['time']);
 		
 		// Linkify linkables
 		$tx['hash'] = createLink(Type::Transaction, $tx['hash'], substr($tx['hash'], 0, 32));
-		$tx['height'] = createLink(Type::Block, $tx['height']);
+		$tx['height'] = createLink(Type::Block, $tx['height'], number_format($tx['height']));
 	}
 
 	$viewdata['transactions'] = array_reverse(array_slice($transactions, $limits['current']['start'], $limits['amount']));
