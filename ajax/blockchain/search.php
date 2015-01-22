@@ -1,4 +1,5 @@
 <?php
+	require __DIR__ . "/../../config.php";
 	require __DIR__ . "/../../lib/abe.php";
 	$result = $abe->search($_GET['term']);
 	if($result === false){

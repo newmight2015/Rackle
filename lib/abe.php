@@ -1,5 +1,5 @@
 <?php
-	require __DIR__ . "/baseconv.php"; // Base conversion class used for base58 encoding/decoding
+	use \DoctorBlue\BaseConvert;
 	
 	class ABE {
 		private $chain; // The chain identifier given by ABE (Check 'chain' table in database)
@@ -36,7 +36,7 @@
 			if(strlen($term) === 34){
 				// Catch exception thrown if input is not base58
 				try{
-					$addrhex = baseconv::base58_hex($term);
+					$addrhex = BaseConvert::base58_hex($term);
 				}catch(Exception $e){
 					return false;
 				}
@@ -393,12 +393,12 @@
 			$checksum = hash("sha256", hash("sha256", $pubkeybs, true)); // Calculate checksum
 			$checksum = substr($checksum, 0, 8); // Shorten to 4 bytes
 			$pubkey .= $checksum; // Append checksum to pubkey hash
-			return baseconv::hex_base58($pubkey); // Convert to base 58 and return
+			return BaseConvert::hex_base58($pubkey); // Convert to base 58 and return
 		}
 		
 		// Returns the public key hash extracted from the given address
 		public function addressToPubkeyHash($address){
-			$hexaddr = baseconv::base58_hex($address); // Convert to hexadecimal
+			$hexaddr = BaseConvert::base58_hex($address); // Convert to hexadecimal
 			$unchecked = substr($hexaddr, 2, 40); // Strip version byte + checksum
 			return $unchecked;
 		}
