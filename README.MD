@@ -35,7 +35,7 @@ I then start ABE every 5 seconds using the following bash script:
 You can start this script in a screen session or with an @reboot cron. Even better you could write a simple init script for it (Please share it if you do).
 
 ### Configuring Rackle
-Now that you got ABE loading data into your database, you can get Rackle running. Copy everything into a publicly accessible directory on your web server and copy the sample configuration file `config.dist.php` to `config.php`. Open the file in a text editor and fill in your database information. You will also need to fill in the address version byte for your coin and ABE's internal ID. You can look this up in the database with a simple query:
+Now that you got ABE loading data into your database, you can get Rackle running. Copy everything into a publicly accessible directory on your web server and copy the sample configuration file `rackle.sample.ini` to `../rackle.ini` (outside web root, if you want it somewhere else, just edit CONFIG_PATH on index.php:1). Open the file in a text editor and fill in your database information. You will also need to fill in the address version byte for your coin and ABE's internal ID. You can look this up in the database with a simple query:
 
     SELECT chain_id, chain_name, HEX(chain_address_version) FROM chain;
 
@@ -53,10 +53,10 @@ Sample output:
 For Omnicoin, the chain ID would be 4 and the address version byte would be "73".
 
 ### Setting up rewrite rules
-Rackle requires a couple of rewrite rules. I'm not going to bother telling you how to add them, but I use the following in nginx:
+Rackle requires a rewrite rule in order to work. The following works for nginx:
 
-    rewrite ^/api/(.*?)/(.*)$ /ajax/$1/$2.php;
-    rewrite ^/blockchain/(.+?)/(.*?)$ /index.php?page=blockchain&view=$1&query=$2;
-    rewrite ^/blockchain(/?)(.*?)$ /index.php?page=blockchain$2;
+	location / {
+		try_files $uri $uri/ /index.php?path=$uri&$args;
+	}
 
-I could probably do better, but I find that these work just fine in nginx.
+That's it, you're done!

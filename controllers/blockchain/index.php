@@ -1,5 +1,4 @@
 <?php
-	require_once "lib/paginator.php";
 	$numBlocks = $abe->getNumBlocks();
 	$paginator = new Paginator(20, $numBlocks, true);
 	$viewdata['paginator'] = $paginator->getAll();

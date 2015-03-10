@@ -1,16 +1,29 @@
 <?php
+	require __DIR__ . "/../vendor/doctorblue/baseconvert/src/BaseConvert.php";
 	use \DoctorBlue\BaseConvert;
 	
 	class ABE {
+		private static $instance = null; // Instance for singleton
 		private $chain; // The chain identifier given by ABE (Check 'chain' table in database)
 		private $addrver; // Address version byte (Hexadecimal)
 		private $db; // Database handle assigned by constructor
 		
 		// Assign properties and connect to database
-		public function __construct($chain, $addrver, $dsn, $dbuser, $dbpass){
-			$this->chain = $chain;
-			$this->addrver = $addrver;
-			$this->db = new PDO($dsn, $dbuser, $dbpass);
+		protected function __construct(){
+			$config = Configuration::get();
+			
+			$this->chain = $config['coin']['chain_id'];
+			$this->addrver = $config['coin']['addr_version'];
+			$dsn = "mysql:host=" . $config['db']['host'] . ";dbname=" . $config['db']['abe'];
+			$this->db = new PDO($dsn, $config['db']['user'], $config['db']['pass']);
+		}
+	
+		public static function getInstance() {
+			if(self::$instance == null) {
+				self::$instance = new ABE();
+			}
+			
+			return self::$instance;
 		}
 	
 		// General function for searching when the term type is unknown
@@ -425,6 +438,3 @@
 			return $this->targetToDifficulty($this->calculateTarget($nBits));
 		}
 	}
-	
-	$config['db']['dsn'] = "mysql:host=" . $config['db']['host'] . ";dbname=" . $config['db']['name'];
-	$abe = new ABE($config['coin']['chain_id'], $config['coin']['addr_version'], $config['db']['dsn'], $config['db']['user'], $config['db']['pass']);

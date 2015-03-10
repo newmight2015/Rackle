@@ -1,5 +1,5 @@
 <?php
-	if($viewdata['block'] = $abe->getBlock($_GET['query'])) {
+	if($viewdata['block'] = $abe->getBlock($rpath[3])) {
 		$viewdata['block']['transactions'] = $abe->getTransactionsByBlock($viewdata['block']['id']);
 		$viewdata['block']['transactions'][0]['coinbase'] = "(Coinbase)"; // First transaction is coinbase
 		
