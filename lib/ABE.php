@@ -4,16 +4,16 @@
 	
 	class ABE {
 		private static $instance = null; // Instance for singleton
-		private $chain; // The chain identifier given by ABE (Check 'chain' table in database)
-		private $addrver; // Address version byte (Hexadecimal)
+		private static $chain; // The chain identifier given by ABE (Check 'chain' table in database)
+		private static $addrver; // Address version byte (Hexadecimal)
 		private $db; // Database handle assigned by constructor
 		
 		// Assign properties and connect to database
 		protected function __construct(){
 			$config = Configuration::get();
 			
-			$this->chain = $config['coin']['chain_id'];
-			$this->addrver = $config['coin']['addr_version'];
+			self::$chain = $config['coin']['chain_id'];
+			self::$addrver = $config['coin']['addr_version'];
 			$dsn = "mysql:host=" . $config['db']['host'] . ";dbname=" . $config['db']['abe'];
 			$this->db = new PDO($dsn, $config['db']['user'], $config['db']['pass']);
 		}
@@ -113,7 +113,7 @@
 				   WHERE chain.chain_id = ?
 				     AND cc.in_longest = 1";
 			$st = $this->db->prepare($q);
-			$st->execute(array($this->chain));
+			$st->execute(array(self::$chain));
 			return $st->fetchColumn();
 		}
 		
@@ -154,12 +154,12 @@
 				LIMIT 1";
 			
 			$st = $this->db->prepare($q);
-			$st->execute(array($this->chain, $hash));
+			$st->execute(array(self::$chain, $hash));
 			$block = $st->fetch();
 			
 			$block['time'] = date("Y-m-d H:i:s", $block['time']); // Convert timestamp to readable format
 			$block['output'] = $block['output'] / pow(10, 8); // Convert OMC-satoshi to OMC
-			$block['difficulty'] = round($this->calculateDifficulty($block['bits']),4); // Calculate difficulty from nBits
+			$block['difficulty'] = round(self::calculateDifficulty($block['bits']),4); // Calculate difficulty from nBits
 			$block['total_coins'] = $block['total_satoshis'] / pow(10, 8); // Convert satoshi to OMC again
 			$block['avg_age'] = round($block['satoshi_secs'] / $block['total_satoshis'] / 86400, 4); // Calculate average
 			$block['chain_age'] = round($block['total_secs'] / 86400, 4); // Convert seconds to days
@@ -201,12 +201,12 @@
              ORDER BY cc.block_height DESC";
 			 
 			$st = $this->db->prepare($q);
-			$st->execute(array($this->chain, $fromHeight, $toHeight));
+			$st->execute(array(self::$chain, $fromHeight, $toHeight));
 			$blocks = $st->fetchAll();
 			foreach($blocks as $key => $block){
 				$blocks[$key]['time'] = date("Y-m-d H:i:s", $block['time']); // Convert timestamp to readable format
 				$blocks[$key]['output'] = $block['output'] / pow(10, 8); // Convert OMC-satoshi to OMC
-				$blocks[$key]['difficulty'] = round($this->calculateDifficulty($block['bits']),4); // Calculate difficulty from nBits
+				$blocks[$key]['difficulty'] = round(self::calculateDifficulty($block['bits']),4); // Calculate difficulty from nBits
 				$blocks[$key]['total_coins'] = $block['total_satoshis'] / pow(10, 8); // Convert satoshi to OMC again
 				$blocks[$key]['avg_age'] = round($block['satoshi_secs'] / $block['total_satoshis'] / 86400, 4); // Calculate average
 				$blocks[$key]['chain_age'] = round($block['total_secs'] / 86400, 4); // Convert seconds to days
@@ -236,7 +236,7 @@
 			GROUP BY tx.tx_id
 			ORDER BY tx.tx_id DESC";
 			$st = $this->db->prepare($q);
-			$st->execute(array($this->chain, $block));
+			$st->execute(array(self::$chain, $block));
 			return $st->fetchAll();
 		}
 		
@@ -307,7 +307,7 @@
 			GROUP BY tx_hash
 			ORDER BY time ASC";
 			$st = $this->db->prepare($q);
-			$st->execute(array($this->chain, $pubkeyhash, $this->chain, $this->chain, $pubkeyhash, $this->chain));
+			$st->execute(array(self::$chain, $pubkeyhash, self::$chain, self::$chain, $pubkeyhash, self::$chain));
 			$txs = $st->fetchAll();
 			
 			$runbalance = 0;
@@ -338,7 +338,7 @@
 			AND tx_hash = UNHEX(?);";
 			
 			$st = $this->db->prepare($q);
-			$st->execute(array($this->chain, $hash));
+			$st->execute(array(self::$chain, $hash));
 			$transaction = $st->fetch();
 			
 			$transaction['inputs'] = $this->getTransactionInputs($hash);
@@ -365,10 +365,10 @@
 				AND tx_hash = UNHEX(?)
 			ORDER BY txin.txin_pos ASC";
 			$st = $this->db->prepare($q);
-			$st->execute(array($this->chain, $hash));
+			$st->execute(array(self::$chain, $hash));
 			$inputs = $st->fetchAll();
 			foreach($inputs as $key => $input){
-				$inputs[$key]['address'] = $this->pubkeyHashToAddress($input['pubkey_hash']);
+				$inputs[$key]['address'] = self::pubkeyHashToAddress($input['pubkey_hash']);
 			}
 			return $inputs;
 		}
@@ -391,17 +391,17 @@
 				AND tx_hash = UNHEX(?)
 			ORDER BY txout.txout_pos ASC";
 			$st = $this->db->prepare($q);
-			$st->execute(array($this->chain, $hash));
+			$st->execute(array(self::$chain, $hash));
 			$outputs = $st->fetchAll();
 			foreach($outputs as $key => $output){
-				$outputs[$key]['address'] = $this->pubkeyHashToAddress($output['pubkey_hash']);
+				$outputs[$key]['address'] = self::pubkeyHashToAddress($output['pubkey_hash']);
 			}
 			return $outputs;
 		}
 		
 		// Returns an address for the given public key
-		public function pubkeyHashToAddress($pubkey){
-			$pubkey = $this->addrver . $pubkey; // Prepend version byte
+		public static function pubkeyHashToAddress($pubkey){
+			$pubkey = self::$addrver . $pubkey; // Prepend version byte
 			$pubkeybs = pack("H*", $pubkey); // Pack to raw bytestring
 			$checksum = hash("sha256", hash("sha256", $pubkeybs, true)); // Calculate checksum
 			$checksum = substr($checksum, 0, 8); // Shorten to 4 bytes
@@ -410,19 +410,19 @@
 		}
 		
 		// Returns the public key hash extracted from the given address
-		public function addressToPubkeyHash($address){
+		public static function addressToPubkeyHash($address){
 			$hexaddr = BaseConvert::base58_hex($address); // Convert to hexadecimal
 			$unchecked = substr($hexaddr, 2, 40); // Strip version byte + checksum
 			return $unchecked;
 		}
 		
 		// Calculates difficulty using a block target value
-		public function targetToDifficulty($target){
+		public static function targetToDifficulty($target){
 			return ((1 << 224) - 1) * 1000 / ($target + 1) / 1000;
 		}
 		
 		// Calculate a target value using the number of bits required
-		public function calculateTarget($nBits){
+		public static function calculateTarget($nBits){
 			$shift = 8 * ((($nBits >> 24) & 0xff) - 3);
 			$bits = $nBits & 0x7fffff;
 			$sign = ($nBits & 0x800000 ? -1 : 1);
@@ -434,7 +434,7 @@
 		}
 		
 		// Calculate the block difficulty from the number of bits required
-		public function calculateDifficulty($nBits){
-			return $this->targetToDifficulty($this->calculateTarget($nBits));
+		public static function calculateDifficulty($nBits){
+			return self::targetToDifficulty(self::calculateTarget($nBits));
 		}
 	}
