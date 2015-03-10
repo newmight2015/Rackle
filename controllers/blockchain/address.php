@@ -36,6 +36,6 @@
 
 	$viewdata['transactions'] = array_reverse(array_slice($transactions, $limits['current']['start'], $limits['amount']));
 	$viewdata['address'] = $address;
-	$viewdata['pubkeyhash'] = $abe->addressToPubkeyHash($address);
+	$viewdata['pubkeyhash'] = $abe::addressToPubkeyHash($address);
 	$viewdata['balance'] = isset($transactions[0]) ? end($transactions)['balance'] : "0.00000000";
 	$pagedata['view'] = $m->render('blockchain/address', $viewdata);
