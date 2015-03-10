@@ -1,6 +1,8 @@
 # Rackle
 Rackle is an open source blockchain explorer initially written for Omnicoin. It builds on top of bitcoin-ABE's database, and basically acts as an improvement to the simple web server it presents. Rackle is written in PHP and manages dependencies using Composer.
 
+[![Code Climate](https://codeclimate.com/github/DoctorBlue/Rackle/badges/gpa.svg)](https://codeclimate.com/github/DoctorBlue/Rackle) [![Test Coverage](https://codeclimate.com/github/DoctorBlue/Rackle/badges/coverage.svg)](https://codeclimate.com/github/DoctorBlue/Rackle)
+
 ## Requirements
 - A MySQL database
 - Bitcoin-ABE
