@@ -18,6 +18,8 @@
 	// Get requested path
 	if(filter_has_var(INPUT_GET, 'path')) {
 		$path = filter_input(INPUT_GET, 'path', FILTER_SANITIZE_STRING);
+	} else {
+		$path = $defaultPage;
 	}
 	
 	if($path === '/') {
