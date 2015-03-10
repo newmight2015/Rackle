@@ -1,17 +1,17 @@
 <?php
 	// Seriously-huge-entries blacklist
 	$blacklist = array("ocFnBhCHVNSSKx1yAkpWtUwNWXjNHyaN7H");
+	$address = $rpath[3];
 	
 	// Get transactions to and from address
 	$transactions = array();
-	if(in_array($_GET['query'], $blacklist)) {
+	if(in_array($address, $blacklist)) {
 		addMessage("error", "This address has too many records to display.");
 	} else {
-		$transactions = $abe->getTransactionsByAddress($_GET['query']);
+		$transactions = $abe->getTransactionsByAddress($address);
 	}
 
 	// Paginate results
-	require_once "lib/paginator.php";
 	$paginator = new Paginator(50, count($transactions), true);
 	$limits = $paginator->getAll();
 	
@@ -35,7 +35,7 @@
 	}
 
 	$viewdata['transactions'] = array_reverse(array_slice($transactions, $limits['current']['start'], $limits['amount']));
-	$viewdata['address'] = $_GET['query'];
-	$viewdata['pubkeyhash'] = $abe->addressToPubkeyHash($_GET['query']);
+	$viewdata['address'] = $address;
+	$viewdata['pubkeyhash'] = $abe->addressToPubkeyHash($address);
 	$viewdata['balance'] = isset($transactions[0]) ? end($transactions)['balance'] : "0.00000000";
 	$pagedata['view'] = $m->render('blockchain/address', $viewdata);

@@ -1,78 +1,89 @@
 <?php
-	require 'config.php';
+	define('CONFIG_PATH', __DIR__ . "/../rackle.ini");
+	
+	// Register project and composer autoloaders
+	require 'autoload.php';
 	require 'vendor/autoload.php';
-
-	// Load basic site variables and functions
+	
+	// Useful functions I hope to refactor out some time
+	require 'lib/functions.php';
+	
+	// Initialize basic site variables
 	$data = array("messages" => array());
 	$pagedata = array();
 	$viewdata = array();
 	
-	$defaultPage = "blockchain";
+	$defaultPage = "/blockchain";
 	
-	$curpath = $defaultPage;
-	if(isset($_GET['page'])) $curpath = $_GET['page'];
-	if(isset($_GET['view'])) $curpath .= "/" . $_GET['view'];
-	if(isset($_GET['query'])) $curpath .= "/" . $_GET['query'];
-	
-	$global = array(
-		"curpath" => $curpath
-	);
-	
-	require 'lib/functions.php';
-	
-	if(isset($_GET['start'])){
-		$paginate['start'] = filter_var($_GET['start'], FILTER_SANITIZE_NUMBER_INT);
+	// Get requested path
+	if(filter_has_var(INPUT_GET, 'path')) {
+		$path = filter_input(INPUT_GET, 'path', FILTER_SANITIZE_STRING);
 	}
 	
-	// Initialize templating engine
-	$m = new Mustache_Engine(array(
-		'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . "/views"),
-		'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . "/views/partials"),
-		'helpers' => array('global' => $global)
-	));
-	
-	// Valid pages and information about them - might eventually be SQL-based
-	$validpages = array("blockchain", "faucet", "pool");
-	$data['menuitems'] = array(
-		array(
-			"title" => "Blockchain Explorer",
-			"link" => "/blockchain", 
-			"icon" => "boxbilling"
-		),
-		array(
-			"title" => "Faucet", 
-			"link" => "/faucet",
-			"icon" => "watertap-plumbing"
-		),
-		array(
-			"title" => "Pool", 
-			"link" => "http://pool.omnicoin.cc", 
-			"icon" => "cpu-processor"
-		)
-	);
-
-	// Prepare array for error messages
-	//add_message("error", "Somehow a very mysterious test error has occurred. It is rather lengthy too.");
-	
-	// Set default value if page is not defined
-	if(empty($_GET['page'])){
-		$_GET['page'] = $defaultPage;
+	if($path === '/') {
+		$path = $defaultPage;
 	}
 	
-	// Set the page value to load 404 page on invalid page name
-	if(!in_array($_GET['page'], $validpages)){
-		$_GET['page'] = "404";
+	// Return an error message if the page doesn't exist
+	$rpath = explode('/', $path);
+	$validpages = array("api", "blockchain", "faucet");
+	if(!in_array($rpath[1], $validpages)) {
+		error_log("Invalid pagename: " . $rpath[1]);
+		addMessage('error', 'The page you requested could not be found.');
+		$path = $defaultPage;
+		$rpath = explode('/', $path);
 	}
 	
-	// Include the file with info about the page and all the data needed by the template
-	require "controllers/" . $_GET['page'] . ".php";
-	
-	// Replace javascript/css links with tags (Avoids inserting tags if variable isn't set)
-	$data['javascript'] = (isset($data['javascript']) ? "<script src='" . $data['javascript'] . "'></script>" : "");
-	$data['stylesheet'] = (isset($data['stylesheet']) ? "<link rel='stylesheet' href='" . $data['stylesheet'] . "' />" : "");
-	
-	// Render the specific page content
-	$data['content'] = $m->render($_GET['page'], $pagedata);
-	
-	// Render the main template and print it
-	echo $m->render('index', $data);
+	// Don't load Mustache and controllers for API
+	if($rpath[1] === 'api') {
+		$apicalls = array('/api/blockchain/search');
+		if(in_array($path, $apicalls)) { // Include requested API page
+			require __DIR__ . $path . '.php';
+		} else { // Include JSON 404 page
+			require __DIR__ . '/api/404.php';
+		}
+	} else {
+		// Helper variable for Mustache
+		$global = array(
+			"curpath" => $path
+		);
+		
+		// Initialize templating engine
+		$m = new Mustache_Engine(array(
+			'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . "/views"),
+			'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . "/views/partials"),
+			'helpers' => array('global' => $global)
+		));
+		
+		// Populate the menu
+		$data['menuitems'] = array(
+			array(
+				"title" => "Blockchain Explorer",
+				"link" => "/blockchain", 
+				"icon" => "boxbilling"
+			),
+			array(
+				"title" => "Faucet", 
+				"link" => "/faucet",
+				"icon" => "watertap-plumbing"
+			),
+			array(
+				"title" => "Pool", 
+				"link" => "http://pool.omnicoin.cc", 
+				"icon" => "cpu-processor"
+			)
+		);
+			
+		// Include the file with info about the page and all the data needed by the template
+		require "controllers/" . $rpath[1] . ".php";
+		
+		// Replace javascript/css links with tags (Avoids inserting tags if variable isn't set)
+		$data['javascript'] = (isset($data['javascript']) ? "<script src='" . $data['javascript'] . "'></script>" : "");
+		$data['stylesheet'] = (isset($data['stylesheet']) ? "<link rel='stylesheet' href='" . $data['stylesheet'] . "' />" : "");
+		
+		// Render the specific page content
+		$data['content'] = $m->render($rpath[1], $pagedata);
+		
+		// Render the main template and print it
+		echo $m->render('index', $data);
+	}

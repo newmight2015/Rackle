@@ -1,6 +1,7 @@
 <?php
-	if($abe->isTransaction($_GET['query'])){
-		$viewdata['tx'] = $abe->getTransaction($_GET['query']);
+	$transaction = $rpath[3];
+	if($abe->isTransaction($transaction)){
+		$viewdata['tx'] = $abe->getTransaction($transaction);
 		$viewdata['tx']['confirmations'] = $abe->getNumBlocks() - $viewdata['tx']['height'];
 		
 		// Prettify & Linkify
