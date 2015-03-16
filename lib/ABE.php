@@ -66,7 +66,7 @@
 		// Check whether a term is a block hash or height (performance warning: requires lookup)
 		// NB: Does not check whether the block exists, use getBlock()
 		public function isBlock($term){
-			return ($this->isBlockHash($term) || $this->isBlockHeight($term));
+			return ($this->isBlockHeight($term) || $this->isBlockHash($term));
 		}
 		
 		// Determine whether the given term is a block hash (light I/O)
