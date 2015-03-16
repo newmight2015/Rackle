@@ -1,8 +1,8 @@
 <?php
 	abstract class Type {
-		const Address = 0;
-		const Block = 1;
-		const Transaction = 2;
+		const ADDRESS = 0;
+		const BLOCK = 1;
+		const TRANSACTION = 2;
 	}
 
 	function addMessage($type, $msg) {
@@ -19,13 +19,13 @@
 		}
 		
 		switch($type) {
-			case Type::Address:
+			case Type::ADDRESS:
 				$link = "/blockchain/address";
 				break;
-			case Type::Block:
+			case Type::BLOCK:
 				$link = "/blockchain/block";
 				break;
-			case Type::Transaction:
+			case Type::TRANSACTION:
 				$link = "/blockchain/transaction";
 				break;
 			default:

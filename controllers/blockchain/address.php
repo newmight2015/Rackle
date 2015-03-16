@@ -30,8 +30,8 @@
 		$tx['time'] = date("Y-m-d H:i:s", $tx['time']);
 		
 		// Linkify linkables
-		$tx['hash'] = createLink(Type::Transaction, $tx['hash'], substr($tx['hash'], 0, 32));
-		$tx['height'] = createLink(Type::Block, $tx['height'], number_format($tx['height']));
+		$tx['hash'] = createLink(Type::TRANSACTION, $tx['hash'], substr($tx['hash'], 0, 32));
+		$tx['height'] = createLink(Type::BLOCK, $tx['height'], number_format($tx['height']));
 	}
 
 	$viewdata['transactions'] = array_reverse(array_slice($transactions, $limits['current']['start'], $limits['amount']));
