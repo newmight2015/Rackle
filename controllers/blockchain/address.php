@@ -1,6 +1,6 @@
 <?php
 	// Seriously-huge-entries blacklist
-	$blacklist = array("ocFnBhCHVNSSKx1yAkpWtUwNWXjNHyaN7H");
+	$blacklist = array("");
 	$address = $rpath[3];
 	
 	// Get transactions to and from address
