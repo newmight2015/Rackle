@@ -26,20 +26,20 @@
 		$amtcolor = $tx['amount'] > 0 ? "green" : "red";
 		
 		// Prettify numbers (Thousand separator and +/- colors)
-		$tx['amount'] = "<span style='color:$amtcolor'>" . number_format($tx['amount'] / pow(10,8), 8) . "</span>";
+		$tx['amount'] = "<span style='color:$amtcolor'>" . Format::amount($tx['amount']) . "</span>";
 
 		// Format timestamp
 		$tx['time'] = date("Y-m-d H:i:s", $tx['time']);
 		
 		// Linkify linkables
-		$tx['hash'] = createLink(Type::TRANSACTION, $tx['hash'], substr($tx['hash'], 0, 64));
-		$tx['height'] = createLink(Type::BLOCK, $tx['height'], number_format($tx['height']));
+		$tx['hash'] = Format::link(Type::TRANSACTION, $tx['hash'], substr($tx['hash'], 0, 64));
+		$tx['height'] = Format::link(Type::BLOCK, $tx['height'], number_format($tx['height']));
 	}
 
 	$viewdata['transactions'] = array_reverse(array_slice($transactions, $limits['current']['start'], $limits['amount']));
 	$viewdata['address'] = $address;
 	$viewdata['pubkeyhash'] = $abe::addressToPubkeyHash($address);
-	$viewdata['balance'] = number_format($balance / pow(10,8), 8);
-	$viewdata['total_in'] = number_format($total_in / pow(10,8), 8);
-	$viewdata['total_out'] = number_format($total_out / pow(10,8), 8);
+	$viewdata['balance'] = Format::amount($balance);
+	$viewdata['total_in'] = Format::amount($total_in);
+	$viewdata['total_out'] = Format::amount($total_out);
 	$pagedata['view'] = $m->render('blockchain/address', $viewdata);

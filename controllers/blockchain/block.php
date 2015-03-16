@@ -10,8 +10,8 @@
 		}
 		
 		foreach($viewdata['block']['transactions'] as $key => $transaction) {
-			$viewdata['block']['transactions'][$key]['hash'] = createLink(Type::TRANSACTION, $transaction['hash']);
-			$viewdata['block']['transactions'][$key]['amount'] = number_format($transaction['amount'] / pow(10, 8), 8);
+			$viewdata['block']['transactions'][$key]['hash'] = Format::link(Type::TRANSACTION, $transaction['hash']);
+			$viewdata['block']['transactions'][$key]['amount'] = Format::amount($transaction['amount']);
 		}
 		
 		// Render

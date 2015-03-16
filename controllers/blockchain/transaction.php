@@ -1,29 +1,31 @@
 <?php
 	$transaction = $rpath[3];
 	if($abe->isTransaction($transaction)){
-		$viewdata['tx'] = $abe->getTransaction($transaction);
-		$viewdata['tx']['confirmations'] = $abe->getNumBlocks() - $viewdata['tx']['height'];
+		$tx = $abe->getTransaction($transaction);
+		$tx['confirmations'] = $abe->getNumBlocks() - $tx['height'];
 		
 		// Prettify & Linkify
-		$viewdata['tx']['time'] = date("Y-m-d H:i:s", $viewdata['tx']['time']);
-		$viewdata['tx']['size'] = number_format($viewdata['tx']['size']);
-		$viewdata['tx']['block'] = createLink(Type::BLOCK, $viewdata['tx']['block']);
-		$viewdata['tx']['confSVG'] = SVG::percentageCircle(min($viewdata['tx']['confirmations'], 4), 4, 54); // Calculate SVG path for confirmation arc/circle
-		$viewdata['tx']['confHideZero'] = ($viewdata['tx']['confirmations'] == 0 ? "" : "display: none;");
+		$tx['time'] = date("Y-m-d H:i:s", $tx['time']);
+		$tx['size'] = number_format($tx['size']);
+		$tx['block'] = Format::link(Type::BLOCK, $tx['block']);
+		$tx['confSVG'] = SVG::percentageCircle(min($tx['confirmations'], 4), 4, 54); // Calculate SVG path for confirmation arc/circle
+		$tx['confHideZero'] = ($tx['confirmations'] == 0 ? "" : "display: none;");
 		
-		foreach($viewdata['tx']['inputs'] as $key => $input) {
-			$viewdata['tx']['inputs'][$key]['address'] = createLink(Type::ADDRESS, $input['address']);
-			$viewdata['tx']['inputs'][$key]['amount'] = number_format($input['amount'] / pow(10, 8), 8);
+		foreach($tx['inputs'] as $key => &$input) {
+			$input['address'] = Format::link(Type::ADDRESS, $input['address']);
+			$input['amount'] = Format::amount($input['amount']);
 		}
 		
-		foreach($viewdata['tx']['outputs'] as $key => $output) {
-			$viewdata['tx']['outputs'][$key]['address'] = createLink(Type::ADDRESS, $output['address']);
-			$viewdata['tx']['outputs'][$key]['amount'] = number_format($output['amount'] / pow(10, 8), 8);
+		foreach($tx['outputs'] as $key => &$output) {
+			$output['address'] = Format::link(Type::ADDRESS, $output['address']);
+			$output['amount'] = Format::amount($output['amount']);
 		}
 			
-		if(empty($viewdata['tx']['inputs'])) {
-			$viewdata['tx']['inputs'] = array("address" => "Coinbase (Mining)", "amount" => $viewdata['tx']['outputs'][0]['amount']);
+		if(empty($tx['inputs'])) {
+			$tx['inputs'] = array("address" => "Coinbase (Mining)", "amount" => $tx['outputs'][0]['amount']);
 		}
+		
+		$viewdata['tx'] = $tx;
 		
 		// Render
 		$pagedata['view'] = $m->render('blockchain/transaction', $viewdata);
