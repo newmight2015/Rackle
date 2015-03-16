@@ -277,15 +277,27 @@
 			$st->bindParam("height", $curheight, PDO::PARAM_INT);
 			$st->bindParam("pubkey", $pubkeyhash, PDO::PARAM_STR);
 			$st->execute();
-			$txs = $st->fetchAll();
-			
-			$runbalance = 0;
-			foreach($txs as &$tx) {
-				$runbalance += $tx['amount'];
-				$tx['balance'] = $runbalance;
-			}
-			
-			return $txs;
+			return $st->fetchAll();
+		}
+		
+		// Get the total amount sent from an address
+		public function getTotalSentByAddress($address) {
+			$pubkeyhash = $this->addressToPubkeyHash($address);
+			$q = "SELECT SUM(txin_value) FROM txin_detail WHERE pubkey_hash = UNHEX(:pubkey) AND in_longest = 1";
+			$st = $this->db->prepare($q);
+			$st->bindParam("pubkey", $pubkeyhash, PDO::PARAM_STR);
+			$st->execute();
+			return $st->fetchColumn();
+		}
+		
+		// Get the total amount received by an address
+		public function getTotalReceivedByAddress($address) {
+			$pubkeyhash = $this->addressToPubkeyHash($address);
+			$q = "SELECT SUM(txout_value) FROM txout_detail WHERE pubkey_hash = UNHEX(:pubkey) AND in_longest = 1";
+			$st = $this->db->prepare($q);
+			$st->bindParam("pubkey", $pubkeyhash, PDO::PARAM_STR);
+			$st->execute();
+			return $st->fetchColumn();
 		}
 		
 		// Get a transaction by its hash
