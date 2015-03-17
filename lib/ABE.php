@@ -66,7 +66,7 @@
 		// Check whether a term is a block hash or height (performance warning: requires lookup)
 		// NB: Does not check whether the block exists, use getBlock()
 		public function isBlock($term){
-			return ($this->isBlockHash($term) || $this->isBlockHeight($term));
+			return ($this->isBlockHeight($term) || $this->isBlockHash($term));
 		}
 		
 		// Determine whether the given term is a block hash (light I/O)
@@ -243,80 +243,61 @@
 		// Get all transactions sent from or to a given address
 		public function getTransactionsByAddress($address){
 			$pubkeyhash = $this->addressToPubkeyHash($address);
+			$curheight = $this->getNumBlocks();
+			
 			// Fetch all transactions
-			$q = "SELECT 
-				tx_hash AS hash,
-				block_height AS height,
-				block_hash AS block,
-				SUM(amount) AS amount,
-				confirmations,
-				time
-			FROM
-				(SELECT 
-					HEX(tx.tx_hash) AS tx_hash,
-						block.block_height,
-						HEX(block.block_hash) AS block_hash,
-						SUM(txout.txout_value) AS amount,
-						(SELECT 
-								block.block_height
-							FROM
-								chain
-							JOIN chain_candidate cc ON cc.block_id = chain_last_block_id
-							JOIN block ON block.block_id = chain_last_block_id
-							WHERE
-								chain.chain_id = ?) - block.block_height + 1 AS confirmations,
-						block.block_nTime AS time
-				FROM
-					tx
-				JOIN `txout` ON txout.tx_id = tx.tx_id
-				JOIN `pubkey` ON pubkey.pubkey_id = txout.pubkey_id
-				JOIN `block_tx` ON block_tx.tx_id = txout.tx_id
-				JOIN `block` ON block.block_id = block_tx.block_id
-				JOIN `chain_candidate` cc ON cc.block_id = block_tx.block_id
-				WHERE
-					pubkey_hash = UNHEX(?)
-						AND cc.chain_id = ?
-						AND cc.in_longest = 1
-				GROUP BY tx_hash UNION SELECT 
-					HEX(tx_hash) AS tx_hash,
-						block.block_height,
-						HEX(block.block_hash) AS block_hash,
-						SUM(txout_value * - 1) AS amount,
-						(SELECT 
-								block.block_height
-							FROM
-								chain
-							JOIN chain_candidate cc ON cc.block_id = chain_last_block_id
-							JOIN block ON block.block_id = chain_last_block_id
-							WHERE
-								chain.chain_id = ?) - block.block_height + 1 AS confirmations,
-						block.block_nTime AS time
-				FROM
-					tx
-				JOIN txin ON txin.tx_id = tx.tx_id
-				JOIN txout ON txin.txout_id = txout.txout_id
-				JOIN pubkey ON pubkey.pubkey_id = txout.pubkey_id
-				JOIN block_tx ON block_tx.tx_id = tx.tx_id
-				JOIN block ON block.block_id = block_tx.block_id
-				JOIN chain_candidate cc ON cc.block_id = block.block_id
-				WHERE
-					pubkey_hash = UNHEX(?)
-						AND cc.chain_id = ?
-						AND cc.in_longest = 1
-				GROUP BY tx_hash) transactions
+			$q = "SELECT
+					HEX(tx.tx_hash) AS hash,
+					b.block_height AS height,
+					HEX(b.block_hash) AS block,
+					-SUM(tx.txin_value) AS amount,
+					:height - b.block_height AS confirmations,
+					b.block_nTime as time
+				FROM txin_detail tx
+				JOIN block b ON (b.block_id = tx.block_id)
+				WHERE pubkey_hash = UNHEX(:pubkey)
+				AND in_longest = 1 
+				GROUP BY tx_hash
+			UNION
+				SELECT
+					HEX(tx.tx_hash) AS hash,
+					b.block_height AS height,
+					HEX(b.block_hash) AS block,
+					SUM(tx.txout_value) AS amount,
+					:height - b.block_height AS confirmations,
+					b.block_nTime AS time
+				FROM txout_detail tx
+				JOIN block b ON b.block_id = tx.block_id
+			   WHERE pubkey_hash = UNHEX(:pubkey)
+				 AND in_longest = 1
 			GROUP BY tx_hash
-			ORDER BY time ASC";
+			ORDER BY height";
+			
 			$st = $this->db->prepare($q);
-			$st->execute(array(self::$chain, $pubkeyhash, self::$chain, self::$chain, $pubkeyhash, self::$chain));
-			$txs = $st->fetchAll();
-			
-			$runbalance = 0;
-			foreach($txs as &$tx) {
-				$runbalance += $tx['amount'];
-				$tx['balance'] = $runbalance;
-			}
-			
-			return $txs;
+			$st->bindParam("height", $curheight, PDO::PARAM_INT);
+			$st->bindParam("pubkey", $pubkeyhash, PDO::PARAM_STR);
+			$st->execute();
+			return $st->fetchAll();
+		}
+		
+		// Get the total amount sent from an address
+		public function getTotalSentByAddress($address) {
+			$pubkeyhash = $this->addressToPubkeyHash($address);
+			$q = "SELECT SUM(txin_value) FROM txin_detail WHERE pubkey_hash = UNHEX(:pubkey) AND in_longest = 1";
+			$st = $this->db->prepare($q);
+			$st->bindParam("pubkey", $pubkeyhash, PDO::PARAM_STR);
+			$st->execute();
+			return $st->fetchColumn();
+		}
+		
+		// Get the total amount received by an address
+		public function getTotalReceivedByAddress($address) {
+			$pubkeyhash = $this->addressToPubkeyHash($address);
+			$q = "SELECT SUM(txout_value) FROM txout_detail WHERE pubkey_hash = UNHEX(:pubkey) AND in_longest = 1";
+			$st = $this->db->prepare($q);
+			$st->bindParam("pubkey", $pubkeyhash, PDO::PARAM_STR);
+			$st->execute();
+			return $st->fetchColumn();
 		}
 		
 		// Get a transaction by its hash

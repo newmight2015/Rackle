@@ -1,6 +1,6 @@
 <?php
 	// Seriously-huge-entries blacklist
-	$blacklist = array("ocFnBhCHVNSSKx1yAkpWtUwNWXjNHyaN7H");
+	$blacklist = array("");
 	$address = $rpath[3];
 	
 	// Get transactions to and from address
@@ -9,6 +9,9 @@
 		addMessage("error", "This address has too many records to display.");
 	} else {
 		$transactions = $abe->getTransactionsByAddress($address);
+		$total_in = $abe->getTotalReceivedByAddress($address);
+		$total_out = $abe->getTotalSentByAddress($address);
+		$balance = $total_in - $total_out;
 	}
 
 	// Paginate results
@@ -18,24 +21,25 @@
 	$viewdata['paginator'] = $limits;
 	
 	// Generate balance and format output
-	foreach($transactions as &$tx){		
+	foreach($transactions as &$tx){
 		// Set amount colour
 		$amtcolor = $tx['amount'] > 0 ? "green" : "red";
 		
 		// Prettify numbers (Thousand separator and +/- colors)
-		$tx['amount'] = "<span style='color:$amtcolor'>" . number_format($tx['amount'] / pow(10,8), 8) . "</span>";
-		$tx['balance'] = number_format($tx['balance'] / pow(10, 8), 8);
+		$tx['amount'] = "<span style='color:$amtcolor'>" . Format::amount($tx['amount']) . "</span>";
 
 		// Format timestamp
 		$tx['time'] = date("Y-m-d H:i:s", $tx['time']);
 		
 		// Linkify linkables
-		$tx['hash'] = createLink(Type::Transaction, $tx['hash'], substr($tx['hash'], 0, 32));
-		$tx['height'] = createLink(Type::Block, $tx['height'], number_format($tx['height']));
+		$tx['hash'] = Format::link(Type::TRANSACTION, $tx['hash'], substr($tx['hash'], 0, 64));
+		$tx['height'] = Format::link(Type::BLOCK, $tx['height'], number_format($tx['height']));
 	}
 
 	$viewdata['transactions'] = array_reverse(array_slice($transactions, $limits['current']['start'], $limits['amount']));
 	$viewdata['address'] = $address;
 	$viewdata['pubkeyhash'] = $abe::addressToPubkeyHash($address);
-	$viewdata['balance'] = isset($transactions[0]) ? end($transactions)['balance'] : "0.00000000";
+	$viewdata['balance'] = Format::amount($balance);
+	$viewdata['total_in'] = Format::amount($total_in);
+	$viewdata['total_out'] = Format::amount($total_out);
 	$pagedata['view'] = $m->render('blockchain/address', $viewdata);

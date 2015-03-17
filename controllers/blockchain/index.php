@@ -7,7 +7,7 @@
 	$blocks = $abe->getBlocksByHeight($limits['start'], $limits['stop']);
 
 	foreach($blocks as $key => &$block) {
-		$block['height'] = createLink(Type::Block, $block['height'], number_format($block['height']));
+		$block['height'] = Format::link(Type::BLOCK, $block['height'], number_format($block['height']));
 	}
 	
 	$viewdata['blocks'] = $blocks;
