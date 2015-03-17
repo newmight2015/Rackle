@@ -31,4 +31,37 @@
 			$tag = "<a href='$link'>$caption</a>";
 			return $tag;
 		}
+		
+		public static function inputs($inputs) {
+			foreach($inputs as &$input) {
+				$input['address'] = Format::link(Type::ADDRESS, $input['address']);
+				$input['amount'] = Format::amount($input['amount']);
+			}
+			return $inputs;
+		}
+		
+		public static function transaction($tx) {
+			$tx['time'] = date("Y-m-d H:i:s", $tx['time']);
+			$tx['size'] = number_format($tx['size']);
+			$tx['block'] = Format::link(Type::BLOCK, $tx['block']);
+			// $tx['confSVG'] = SVG::percentageCircle(min($tx['confirmations'], 4), 4, 54); // Calculate SVG path for confirmation arc/circle
+			// $tx['confHideZero'] = ($tx['confirmations'] == 0 ? "" : "display: none;");
+			
+			$tx['inputs'] = Format::inputs($tx['inputs']);
+			$tx['outputs'] = Format::inputs($tx['outputs']);
+				
+			if(empty($tx['inputs'])) {
+				$tx['inputs'] = array("address" => "Coinbase (Mining)", "amount" => $tx['outputs'][0]['amount']);
+			}
+			
+			return $tx;
+		}
+		
+		public static function block($block) {
+			foreach($block['transactions'] as &$transaction) {
+				$transaction['hash'] = Format::link(Type::TRANSACTION, $transaction['hash']);
+				$transaction['amount'] = Format::amount($transaction['amount']);
+			}
+			return $block;
+		}
 	}
