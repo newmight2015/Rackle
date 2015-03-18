@@ -4,6 +4,52 @@
 </h2>
 <span class="clr">&nbsp;</span>
 
+<table id="bc_addressInfoTable" class="keyvalue">
+	<thead>
+		<tr>
+			<th colspan="2">Information</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Address</td>
+			<td>{{ address }}</td>
+		</tr>
+		<tr>
+			<td>Public Key Hash</td>
+			<td>{{ pubkeyhash }}</td>
+		</tr>
+		<tr>
+			<td>Total Received</td>
+			<td>{{ total_in }} OMC</td>
+		</tr>
+		<tr>
+			<td>Total Sent</td>
+			<td>{{ total_out }} OMC</td>
+		</tr>
+		<tr>
+			<td>Balance</td>
+			<td>{{ balance }} OMC ({{ numtx  }} transactions)</td>
+		</tr>
+	</tbody>
+</table>
+
+<table id="bc_addressQrTable">
+	<thead>
+		<tr>
+			<th>QR Code</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<img src="https://api.qrserver.com/v1/create-qr-code/?size=149x149&data=omnicoin:{{ address }}" />
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<br />
 <table>
 	<thead>
 		<tr>
