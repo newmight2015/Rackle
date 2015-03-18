@@ -37,6 +37,7 @@
 	}
 
 	$viewdata['transactions'] = array_reverse(array_slice($transactions, $limits['current']['start'], $limits['amount']));
+	$viewdata['numtx'] = count($transactions);
 	$viewdata['address'] = $address;
 	$viewdata['pubkeyhash'] = $abe::addressToPubkeyHash($address);
 	$viewdata['balance'] = Format::amount($balance);

@@ -39,3 +39,23 @@
 #bc_confirmationPie {
 	width: 200px;
 }
+
+/* Addresses */
+#bc_addressInfoTable {
+	width: 864px;
+	height: 193px;
+	float: left;
+	
+	margin-right: 25px;
+	margin-bottom: 25px;
+}
+
+#bc_addressQrTable {
+	width: 160px;
+	float: left;
+}
+
+#bc_addressQrTable td {
+	padding: 5px;
+	padding-bottom: 0;
+}
