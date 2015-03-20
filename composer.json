@@ -1,6 +1,6 @@
 {
 	"require": {
 		"mustache/mustache": "~2.5",
-		"doctorblue/baseconvert": "~1.0"
+		"doctorblue/baseconvert": "^1.0.2"
 	}
 }

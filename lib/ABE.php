@@ -1,5 +1,5 @@
 <?php
-	require __DIR__ . "/../vendor/doctorblue/baseconvert/src/BaseConvert.php";
+	//require __DIR__ . "/../vendor/doctorblue/baseconvert/src/BaseConvert.php";
 	use \DoctorBlue\BaseConvert;
 	
 	class ABE {
