@@ -21,6 +21,12 @@
 	
 	$svcContainer->setConnectionManager($config['db']['db'], $conManager);
 	
+	// Set up logging for Propel
+	use \Monolog\Logger;
+	$propelLogger = new Logger('propel');
+	$propelLogger->pushHandler(new \Monolog\Handler\StreamHandler($config['log']['propel'], Logger::WARNING));
+	$svcContainer->setLogger('defaultLogger', $propelLogger);
+	
 	// Useful functions I hope to refactor out some time
 	require 'lib/functions.php';
 	
