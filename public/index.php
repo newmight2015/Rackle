@@ -5,6 +5,22 @@
 	require 'autoload.php';
 	require 'vendor/autoload.php';
 	
+	// Get configuration
+	$config = Configuration::get();
+	
+	// Set up Propel ORM
+	$svcContainer = \Propel\Runtime\Propel::getServiceContainer();
+	$conManager = new \Propel\Runtime\Connection\ConnectionManagerSingle();
+	
+	$svcContainer->setAdapterClass($config['db']['db'], 'mysql');
+	$conManager->setConfiguration(array(
+		'dsn'	=> 'mysql:host=' . $config['db']['host'] . ';dbname=' . $config['db']['db'],
+		'user'	=> $config['db']['user'],
+		'pass'	=> $config['db']['pass']
+	));
+	
+	$svcContainer->setConnectionManager($config['db']['db'], $conManager);
+	
 	// Useful functions I hope to refactor out some time
 	require 'lib/functions.php';
 	

@@ -1,4 +1,5 @@
 vendor
 rackle.ini
 composer.lock
+doc/propel.ini
 **/Thumbs.db
