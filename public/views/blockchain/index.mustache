@@ -1,10 +1,19 @@
 <h2>Latest Blocks</h2>
 {{ numBlocks }}
 <table>
-	<thead><tr><th>Block</th><th>Approx. Time</th><th>TXs</th><th>Output</th><th>Difficulty</th><th>Coins Generated</th><th>Average Age</th><th>Chain Age</th><th>% CoinDD</th></tr></thead>
+	<thead><tr><th>Block</th><th>Approx. Time</th><th>Age</th><th>TXs</th><th>Output</th><th>Difficulty</th><th>Total Coins</th><th>%CoinDD</th></tr></thead>
 	<tbody>
 		{{# blocks }}
-			<tr><td>{{{ height }}}</td><td>{{ time }}</td><td>{{ num_tx }}</td><td>{{ output }}</td><td>{{ difficulty }}</td><td>{{ total_coins }}</td><td>{{ avg_age }}</td><td>{{ chain_age }}</td><td>{{ pct_days_destroyed }}</td></tr>
+			<tr>
+				<td>{{{ height }}}</td>
+				<td>{{ time }}</td>
+				<td>{{ age }}</td>
+				<td>{{ num_tx }}</td>
+				<td>{{ output }}</td>
+				<td>{{ difficulty }}</td>
+				<td>{{ total_coins }}</td>
+				<td>{{ pct_days_destroyed }}</td>
+			</tr>
 		{{/ blocks }}
 	</tbody>
 </table>

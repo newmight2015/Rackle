@@ -34,21 +34,16 @@ nav {
 
 #navwrap ul li {
 	display: inline-block;
-	margin-right: -5px;
 	cursor: pointer;
+	float: left;
 	background-color: #4F3A6B;
 	border-right: 1px solid #664B8A;
 }
 
 #navwrap ul li:nth-child(1) {
-	margin-right: -4px;
 	border-left: 1px solid #664B8A;
 }
 
-#navwrap ul li:last-child {
-	margin-right: -3px;
-	border-left: 1px solid #664B8A;
-}
 
 #navwrap ul li:active, #navwrap ul li.active {
 	background-color: #664B8A;
@@ -71,6 +66,10 @@ nav {
 	top: 3px;
 	margin-right: 13px;
 	font-size: 14pt;
+}
+
+#userbox {
+	float: right;
 }
 
 .message {
