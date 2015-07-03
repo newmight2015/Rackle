@@ -348,9 +348,9 @@
 			ORDER BY txin.txin_pos ASC";
 			$st = $this->db->prepare($q);
 			$st->execute(array(self::$chain, $hash));
-			$inputs = $st->fetchAll();
-			foreach($inputs as $key => $input){
-				$inputs[$key]['address'] = self::pubkeyHashToAddress($input['pubkey_hash']);
+			$inputs = $st->fetchAll(PDO::FETCH_ASSOC);
+			foreach($inputs as &$input){
+				$input['address'] = self::pubkeyHashToAddress($input['pubkey_hash']);
 			}
 			return $inputs;
 		}
@@ -374,9 +374,9 @@
 			ORDER BY txout.txout_pos ASC";
 			$st = $this->db->prepare($q);
 			$st->execute(array(self::$chain, $hash));
-			$outputs = $st->fetchAll();
-			foreach($outputs as $key => $output){
-				$outputs[$key]['address'] = self::pubkeyHashToAddress($output['pubkey_hash']);
+			$outputs = $st->fetchAll(PDO::FETCH_ASSOC);
+			foreach($outputs as &$output){
+				$output['address'] = self::pubkeyHashToAddress($output['pubkey_hash']);
 			}
 			return $outputs;
 		}
