@@ -198,10 +198,10 @@
 			$st = $this->db->prepare($q);
 			$st->execute(array(self::$chain, $fromHeight, $toHeight));
 			$blocks = $st->fetchAll();
-			foreach($blocks as $key => &$block){
-				$blocks[$key]['time'] = intval($block['time']); // Convert timestamp to readable format
-				$blocks[$key]['difficulty'] = round(self::calculateDifficulty($block['bits']),4); // Calculate difficulty from nBits
-				$blocks[$key]['pct_days_destroyed'] = round(($block['total_secs'] == 0 ? 0 : (100 - (100 * $block['satoshi_secs'] / $block['total_satoshi_secs']))),4); // Calculate amount of days destroyed
+			foreach($blocks as &$block){
+				$block['time'] = intval($block['time']); // Convert timestamp to readable format
+				$block['difficulty'] = round(self::calculateDifficulty($block['bits']),4); // Calculate difficulty from nBits
+				$block['pct_days_destroyed'] = round(($block['total_secs'] == 0 ? 0 : (100 - (100 * $block['satoshi_secs'] / $block['total_satoshi_secs']))),4); // Calculate amount of days destroyed
 			}
 
 			return $blocks;
