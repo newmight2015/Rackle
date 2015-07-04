@@ -7,6 +7,7 @@
 	$blocks = $abe->getBlocksByHeight($limits['start'], $limits['stop']);
 
 	foreach($blocks as $key => &$block) {
+		$block = Format::block($block);
 		$block['height'] = Format::link(Type::BLOCK, $block['height'], number_format($block['height']));
 	}
 

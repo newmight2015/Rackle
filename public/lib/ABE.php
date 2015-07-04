@@ -156,13 +156,8 @@
 			$st = $this->db->prepare($q);
 			$st->execute(array(self::$chain, $hash));
 			$block = $st->fetch();
-
-			$block['time'] = date("Y-m-d H:i:s", $block['time']); // Convert timestamp to readable format
-			$block['output'] = $block['output'] / pow(10, 8); // Convert OMC-satoshi to OMC
+			$block['time'] = intval($block['time']);
 			$block['difficulty'] = round(self::calculateDifficulty($block['bits']),4); // Calculate difficulty from nBits
-			$block['total_coins'] = $block['total_satoshis'] / pow(10, 8); // Convert satoshi to OMC again
-			$block['avg_age'] = round($block['satoshi_secs'] / $block['total_satoshis'] / 86400, 4); // Calculate average
-			$block['chain_age'] = round($block['total_secs'] / 86400, 4); // Convert seconds to days
 			$block['pct_days_destroyed'] = round(($block['total_secs'] == 0 ? 0 : (100 - (100 * $block['satoshi_secs'] / $block['total_satoshi_secs']))),4); // Calculate amount of days destroyed
 
 			return $block;
@@ -204,13 +199,8 @@
 			$st->execute(array(self::$chain, $fromHeight, $toHeight));
 			$blocks = $st->fetchAll();
 			foreach($blocks as $key => &$block){
-				$blocks[$key]['age'] = Format::age($block['time']); // Time since block was mined
-				$blocks[$key]['time'] = date("Y-m-d H:i:s", $block['time']); // Convert timestamp to readable format
-				$blocks[$key]['output'] = $block['output'] / pow(10, 8); // Convert OMC-satoshi to OMC
+				$blocks[$key]['time'] = intval($block['time']); // Convert timestamp to readable format
 				$blocks[$key]['difficulty'] = round(self::calculateDifficulty($block['bits']),4); // Calculate difficulty from nBits
-				$blocks[$key]['total_coins'] = $block['total_satoshis'] / pow(10, 8); // Convert satoshi to OMC again
-				$blocks[$key]['avg_age'] = round($block['satoshi_secs'] / $block['total_satoshis'] / 86400, 4); // Calculate average
-				$blocks[$key]['chain_age'] = round($block['total_secs'] / 86400, 4); // Convert seconds to days
 				$blocks[$key]['pct_days_destroyed'] = round(($block['total_secs'] == 0 ? 0 : (100 - (100 * $block['satoshi_secs'] / $block['total_satoshi_secs']))),4); // Calculate amount of days destroyed
 			}
 
@@ -238,7 +228,7 @@
 			ORDER BY tx.tx_id DESC";
 			$st = $this->db->prepare($q);
 			$st->execute(array(self::$chain, $block));
-			return $st->fetchAll();
+			return $st->fetchAll(PDO::FETCH_ASSOC);
 		}
 
 		// Get all transactions sent from or to a given address

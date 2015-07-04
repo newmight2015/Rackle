@@ -3,13 +3,13 @@
 		// Fetch
 		$block['transactions'] = $abe->getTransactionsByBlock($block['id']);
 		$block['transactions'][0]['coinbase'] = "(Coinbase)"; // First transaction is coinbase
-		
+
 		// Calculate block size
 		$block['size'] = 0;
 		foreach($block['transactions'] as $transaction) {
 			$block['size'] += $transaction['size'];
 		}
-		
+
 		// Render
 		$viewdata['block'] = Format::block($block);
 		$pagedata['view'] = $m->render('blockchain/block', $viewdata);

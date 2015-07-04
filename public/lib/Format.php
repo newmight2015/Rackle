@@ -58,6 +58,15 @@
 		}
 
 		public static function block($block) {
+			$block['age'] = Format::age($block['time']); // Time since block was mined
+			$block['time'] = date("Y-m-d H:i:s", $block['time']); // Convert timestamp to readable format
+			$block['output'] = $block['output'] / pow(10, 8); // Convert OMC-satoshi to OMC
+			$block['total_coins'] = $block['total_satoshis'] / pow(10, 8); // Convert satoshi to OMC again
+
+			// Stop here if the block doesn't come with transactions
+			if(!isset($block['transactions'])) return $block;
+
+			// Format transactions
 			foreach($block['transactions'] as &$transaction) {
 				$transaction['hash'] = Format::link(Type::TRANSACTION, $transaction['hash']);
 				$transaction['amount'] = Format::amount($transaction['amount']);

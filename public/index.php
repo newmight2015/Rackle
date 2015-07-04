@@ -68,6 +68,7 @@
 		//header('Content-type: application/vnd.api+json');
 		$spath = "/" . $rpath[1] . "/" . $rpath[2] . "/" . $rpath[3];
 		$apicalls = array(
+			'/api/blockchain/block',
 			'/api/blockchain/search',
 			'/api/blockchain/transaction',
 			'/api/user/register',
