@@ -22,9 +22,9 @@
     $call->addData(array(
         "id" => $params['id'],
         "type" => "transaction",
-        "time" => intval($tx['time']),
+        "time" => $tx['time'],
         "block" => $tx['block'],
-        "height" => intval($tx['height']),
+        "height" => $tx['height'],
         "confirmations" => $curheight - $tx['height'],
         "inputs" => $tx['inputs'],
         "outputs" => $tx['outputs']

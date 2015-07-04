@@ -4,6 +4,7 @@ Rackle is an open source blockchain explorer initially written for Omnicoin. It 
 ## Requirements
 - A MySQL database
 - Bitcoin-ABE
+- A 64-bit PHP installation (32-bit may cause integer overflow issues)
 
 ## Instructions
 ### The ABE loader

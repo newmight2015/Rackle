@@ -24,7 +24,7 @@
         "id" => $block['hash'],
         "type" => "block",
         "time" => $block['time'],
-        "height" => intval($block['height']),
+        "height" => $block['height'],
         "merkle" => $block['merkle'],
         "output" => $block['output'],
         "difficulty" => $block['difficulty'],

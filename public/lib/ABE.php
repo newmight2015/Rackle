@@ -114,7 +114,7 @@
 				     AND cc.in_longest = 1";
 			$st = $this->db->prepare($q);
 			$st->execute(array(self::$chain));
-			return $st->fetchColumn();
+			return intval($st->fetchColumn());
 		}
 
 		// Checks if the given term is a height or hash and uses the corresponding method to fetch the block
@@ -157,6 +157,8 @@
 			$st->execute(array(self::$chain, $hash));
 			$block = $st->fetch();
 			$block['time'] = intval($block['time']);
+			$block['height'] = intval($block['height']);
+			$block['output'] = intval($block['output']);
 			$block['difficulty'] = round(self::calculateDifficulty($block['bits']),4); // Calculate difficulty from nBits
 			$block['pct_days_destroyed'] = round(($block['total_secs'] == 0 ? 0 : (100 - (100 * $block['satoshi_secs'] / $block['total_satoshi_secs']))),4); // Calculate amount of days destroyed
 
@@ -199,7 +201,8 @@
 			$st->execute(array(self::$chain, $fromHeight, $toHeight));
 			$blocks = $st->fetchAll();
 			foreach($blocks as &$block){
-				$block['time'] = intval($block['time']); // Convert timestamp to readable format
+				$block['time'] = intval($block['time']);
+				$block['height'] = intval($block['height']);
 				$block['difficulty'] = round(self::calculateDifficulty($block['bits']),4); // Calculate difficulty from nBits
 				$block['pct_days_destroyed'] = round(($block['total_secs'] == 0 ? 0 : (100 - (100 * $block['satoshi_secs'] / $block['total_satoshi_secs']))),4); // Calculate amount of days destroyed
 			}
@@ -210,12 +213,9 @@
 		// Fetches transactions based on the given block id
 		public function getTransactionsByBlock($block) {
 			$q = "SELECT
-					tx.tx_id AS id,
 					HEX(tx.tx_hash) AS hash,
 					tx.tx_size AS size,
-					SUM(txout.txout_value) AS amount,
-					block.block_height AS height,
-					block.block_nTime AS time
+					SUM(txout.txout_value) AS amount
 				FROM block
 				JOIN block_tx ON block_tx.block_id = block.block_id
 				JOIN tx ON tx.tx_id = block_tx.tx_id
@@ -228,7 +228,13 @@
 			ORDER BY tx.tx_id DESC";
 			$st = $this->db->prepare($q);
 			$st->execute(array(self::$chain, $block));
-			return $st->fetchAll(PDO::FETCH_ASSOC);
+			$transactions = $st->fetchAll(PDO::FETCH_ASSOC);
+			foreach($transactions as &$transaction) {
+				$transaction['size'] = intval($transaction['size']);
+				$transaction['amount'] = intval($transaction['amount']);
+			}
+
+			return $transactions;
 		}
 
 		// Get all transactions sent from or to a given address
@@ -313,6 +319,8 @@
 			$st->execute(array(self::$chain, $hash));
 			$transaction = $st->fetch();
 
+			$transaction['time'] = intval($transaction['time']);
+			$transaction['height'] = intval($transaction['height']);
 			$transaction['inputs'] = $this->getTransactionInputs($hash);
 			$transaction['outputs'] = $this->getTransactionOutputs($hash);
 			return $transaction;
@@ -340,6 +348,7 @@
 			$st->execute(array(self::$chain, $hash));
 			$inputs = $st->fetchAll(PDO::FETCH_ASSOC);
 			foreach($inputs as &$input){
+				$input['amount'] = intval($input['amount']);
 				$input['address'] = self::pubkeyHashToAddress($input['pubkey_hash']);
 			}
 			return $inputs;
@@ -366,6 +375,7 @@
 			$st->execute(array(self::$chain, $hash));
 			$outputs = $st->fetchAll(PDO::FETCH_ASSOC);
 			foreach($outputs as &$output){
+				$output['amount'] = intval($output['amount']);
 				$output['address'] = self::pubkeyHashToAddress($output['pubkey_hash']);
 			}
 			return $outputs;
